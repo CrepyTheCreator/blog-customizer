@@ -24,14 +24,18 @@ interface props {
 }
 
 export const ArticleParamsForm = (props: props) => {
-	const [opened, setOpened] = useState(false);
-	const [font, setFont] = useState(fontFamilyOptions[0]);
-	const [size, setSize] = useState(fontSizeOptions[0]);
-	const [fontColor, setFontColor] = useState(fontColors[0]);
-	const [backColor, setBackColor] = useState(backgroundColors[0]);
-	const [contentSize, setContentSize] = useState(contentWidthArr[0]);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [font, setFont] = useState(defaultArticleState.fontFamilyOption);
+	const [size, setSize] = useState(defaultArticleState.fontSizeOption);
+	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
+	const [backColor, setBackColor] = useState(
+		defaultArticleState.backgroundColor
+	);
+	const [contentSize, setContentSize] = useState(
+		defaultArticleState.contentWidth
+	);
 	function sideToggle() {
-		setOpened(opened ? false : true);
+		setIsMenuOpen(isMenuOpen ? false : true);
 	}
 	function submitClick(event: FormEvent) {
 		event.preventDefault();
@@ -50,15 +54,18 @@ export const ArticleParamsForm = (props: props) => {
 	}
 	const asideRef = useRef<HTMLDivElement>(null);
 	useOutsideClickClose({
-		isOpen: opened,
+		isOpen: isMenuOpen,
 		rootRef: asideRef,
-		onChange: setOpened,
+		onChange: setIsMenuOpen,
 	});
 	return (
 		<>
-			<ArrowButton isOpen={opened} onClick={sideToggle} />
+			<ArrowButton isOpen={isMenuOpen} onClick={sideToggle} />
 			<aside
-				className={cn(styles.container, opened ? styles.container_open : '')}
+				className={cn(
+					styles.container,
+					isMenuOpen ? styles.container_open : ''
+				)}
 				ref={asideRef}>
 				<form className={styles.form} onSubmit={submitClick}>
 					<Text size={31} uppercase family='open-sans' weight={800}>

@@ -1,16 +1,108 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
+import cn from 'classnames';
 
 import styles from './ArticleParamsForm.module.scss';
+import { FormEvent, useRef, useState } from 'react';
+import { Select } from 'src/ui/select';
+import {
+	ArticleStateType,
+	backgroundColors,
+	contentWidthArr,
+	defaultArticleState,
+	fontColors,
+	fontFamilyOptions,
+	fontSizeOptions,
+} from 'src/constants/articleProps';
+import { RadioGroup } from 'src/ui/radio-group';
+import { Separator } from 'src/ui/separator';
+import { Text } from 'src/ui/text';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
-export const ArticleParamsForm = () => {
+interface props {
+	setState: React.Dispatch<React.SetStateAction<ArticleStateType>>;
+}
+
+export const ArticleParamsForm = (props: props) => {
+	const [opened, setOpened] = useState(false);
+	const [font, setFont] = useState(fontFamilyOptions[0]);
+	const [size, setSize] = useState(fontSizeOptions[0]);
+	const [fontColor, setFontColor] = useState(fontColors[0]);
+	const [backColor, setBackColor] = useState(backgroundColors[0]);
+	const [contentSize, setContentSize] = useState(contentWidthArr[0]);
+	function sideToggle() {
+		setOpened(opened ? false : true);
+	}
+	function submitClick(event: FormEvent) {
+		event.preventDefault();
+		props.setState({
+			fontFamilyOption: font,
+			fontColor: fontColor,
+			backgroundColor: backColor,
+			contentWidth: contentSize,
+			fontSizeOption: size,
+		});
+		sideToggle();
+	}
+	function reset() {
+		props.setState(defaultArticleState);
+		sideToggle();
+	}
+	const asideRef = useRef<HTMLDivElement>(null);
+	useOutsideClickClose({
+		isOpen: opened,
+		rootRef: asideRef,
+		onChange: setOpened,
+	});
 	return (
 		<>
-			<ArrowButton isOpen={false} onClick={() => {}} />
-			<aside className={styles.container}>
-				<form className={styles.form}>
+			<ArrowButton isOpen={opened} onClick={sideToggle} />
+			<aside
+				className={cn(styles.container, opened ? styles.container_open : '')}
+				ref={asideRef}>
+				<form className={styles.form} onSubmit={submitClick}>
+					<Text size={31} uppercase family='open-sans' weight={800}>
+						Задайте параметры
+					</Text>
+					<Select
+						selected={font}
+						options={fontFamilyOptions}
+						title='Шрифт'
+						onChange={setFont}
+					/>
+					<RadioGroup
+						name=''
+						options={fontSizeOptions}
+						selected={size}
+						title='Размер шрифта'
+						onChange={setSize}
+					/>
+					<Select
+						selected={fontColor}
+						options={fontColors}
+						title='Цвет шрифта'
+						onChange={setFontColor}
+					/>
+					<Separator />
+					<Select
+						selected={backColor}
+						options={backgroundColors}
+						title='Цвет фона'
+						onChange={setBackColor}
+					/>
+					<Select
+						selected={contentSize}
+						options={contentWidthArr}
+						title='Ширина контента'
+						onChange={setContentSize}
+					/>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
+						<Button
+							title='Сбросить'
+							htmlType='reset'
+							type='clear'
+							onClick={reset}
+						/>
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
